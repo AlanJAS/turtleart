@@ -541,12 +541,6 @@ class LogoCode:
                 if current_block.before is not None:
                     current_block.before(self.tw, current_block)
 
-            if not self.tw.hide and self.bindex is not None:
-                current_block = self.tw.block_list.list[self.bindex]
-                current_block.highlight()
-                if current_block.before is not None:
-                    current_block.before(current_block)
-
             # In debugging modes, we pause between steps and show the turtle.
             if self.tw.step_time > 0:
                 self.tw.turtles.get_active_turtle().show()
