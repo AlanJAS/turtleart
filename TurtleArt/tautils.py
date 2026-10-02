@@ -341,20 +341,19 @@ def chooser_dialog(parent_window, filter, action):
 
 def data_from_file(ta_file):
     ''' Open the .ta file, ignoring any .png file that might be present. '''
-    file_handle = open(ta_file, 'r')
     #
     # We try to maintain read-compatibility with all versions of Turtle Art.
     # Try pickle first; then different versions of json.
     #
-    try:
-        data = pickle.load(file_handle)
-    except BaseException:
-        # Rewind necessary because of failed pickle.load attempt
-        file_handle.seek(0)
-        text = file_handle.read()
-        data = data_from_string(text)
-    file_handle.close()
-    return data
+    with open(ta_file, 'rb') as file_handle:
+        try:
+            return pickle.load(file_handle)
+        except (pickle.UnpicklingError, EOFError, AttributeError,
+                ValueError, TypeError):
+            # Rewind necessary because of failed pickle.load attempt
+            file_handle.seek(0)
+            text = file_handle.read().decode('utf-8')
+    return data_from_string(text)
 
 
 def data_from_string(text):
