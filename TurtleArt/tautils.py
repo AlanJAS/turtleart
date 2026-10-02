@@ -789,14 +789,24 @@ def find_start_stack(blk):
 
 
 def find_group(blk):
-    ''' Find the connected group of block in a stack. '''
+    ''' Return the block and its descendants in depth-first order ''' 
     if blk is None:
         return []
-    group = [blk]
-    if blk.connections is not None:
-        for cblk in blk.connections[1:]:
-            if cblk is not None:
-                group.extend(find_group(cblk))
+
+    group = []
+    pending = [blk]
+
+    while pending:
+        current = pending.pop()
+        group.append(current)
+
+        if current.connections:
+            pending.extend(
+                child
+                for child in reversed(current.connections[1:])
+                if child is not None
+            )
+
     return group
 
 
