@@ -233,12 +233,15 @@ def hat_on_top(data):
         i += 1
 
     # Then add the connections
+    positions = {}
+    for index, block_id in enumerate(sort):
+        positions.setdefault(block_id, index)
     for i, blk in enumerate(sort):
         for j in data[blk][4]:
             if j is None:
                 sorted_data[i][4].append(None)
             else:
-                sorted_data[i][4].append(sort.index(j))
+                sorted_data[i][4].append(positions[j])
 
     if data_was_tuple:
         return _tuplify(sorted_data)
