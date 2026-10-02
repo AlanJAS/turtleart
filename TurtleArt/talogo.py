@@ -148,7 +148,7 @@ def _change_user_path(path):
         return None
     if "/" not in path[6:]:
         return None
-    if path[0:5] == "/home" and "/":
+    if path.startswith("/home/"):
         i = path[6:].index("/")
         new_path = USER_HOME + path[6 + i :]
         if new_path == path:
