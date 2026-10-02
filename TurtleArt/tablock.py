@@ -80,6 +80,7 @@ class Blocks:
 
     def __init__(self, font_scale_factor=1, decimal_point='.'):
         self.list = []
+        self._sprite_to_block = {}
         self.max_width = 400
         self.font_scale_factor = font_scale_factor
         self.decimal_point = decimal_point
@@ -101,10 +102,14 @@ class Blocks:
 
     def append_to_list(self, block):
         self.list.append(block)
+        if block.spr is not None:
+            self._sprite_to_block[block.spr] = block
 
     def remove_from_list(self, block):
         if block in self.list:
             self.list.remove(block)
+            if block.spr is not None:
+                self._sprite_to_block.pop(block.spr, None)
 
     def print_list(self, block_type=None):
         for i, block in enumerate(self.list):
@@ -118,10 +123,10 @@ class Blocks:
         self.font_scale_factor = scale
 
     def spr_to_block(self, spr):
-        for b in self.list:
-            if spr == b.spr:
-                return b
-        return None
+        if spr is None:
+            # Preserve lookup behavior for blocks created without sprites.
+            return next((b for b in self.list if b.spr is None), None)
+        return self._sprite_to_block.get(spr)
 
     def get_next_block(self, block):
         if block is None:
