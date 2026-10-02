@@ -325,12 +325,15 @@ class LogoCode:
                 if b == blk:
                     blk = action_blk
 
+        block_indices = {
+            block: index for index, block in enumerate(self.tw.block_list.list)
+        }
         for b in blocks:
             if b.name in ("hat", "hat1", "hat2"):
                 stack_name = get_stack_name(b)
                 if stack_name:
                     stack_key = self._get_stack_key(stack_name)
-                    code = self._blocks_to_code(b)
+                    code = self._blocks_to_code(b, block_indices)
                     self.stacks[stack_key] = self._readline(code)
                 else:
                     self.tw.showlabel("#nostack")
@@ -338,7 +341,7 @@ class LogoCode:
                     self.tw.running_blocks = False
                     return None
 
-        code = self._blocks_to_code(blk)
+        code = self._blocks_to_code(blk, block_indices)
 
         if self._save_blocks is not None:
             # Undo any hidden macro expansion
@@ -362,7 +365,7 @@ class LogoCode:
 
         return code
 
-    def _blocks_to_code(self, blk):
+    def _blocks_to_code(self, blk, block_indices):
         """ Convert a stack of blocks to pseudocode. """
         if blk is None:
             return ["%nothing%", "%nothing%"]
@@ -372,8 +375,8 @@ class LogoCode:
         if len(dock) > 4 and dock[4] in ("[", "]", "]["):
             code.append(dock[4])
         if blk.primitive is not None:  # make a tuple (prim, blk)
-            if blk in self.tw.block_list.list:
-                code.append((blk.primitive, self.tw.block_list.list.index(blk)))
+            if blk in block_indices:
+                code.append((blk.primitive, block_indices[blk]))
             else:
                 code.append(blk.primitive)  # Hidden block
         elif blk.is_value_block():  # Extract the value from content blocks.
@@ -393,7 +396,7 @@ class LogoCode:
                     for c in dock[4]:
                         code.append(c)
                 if b is not None:
-                    code.extend(self._blocks_to_code(b))
+                    code.extend(self._blocks_to_code(b, block_indices))
                 elif blk.docks[i][0] not in ["flow", "unavailable"]:
                     code.append("%nothing%")
         return code
