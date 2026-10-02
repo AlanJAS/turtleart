@@ -2003,8 +2003,7 @@ class TurtleArtWindow():
                         blk.highlight()
                 self.block_operation = 'copying'
                 data = self.assemble_data_to_save(False, False)
-
-                if data is not []:
+                if data:
                     if self.saving_blocks:
                         i = find_hat(data)
                         if i is not None:
