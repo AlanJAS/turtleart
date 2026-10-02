@@ -365,10 +365,14 @@ class LogoCode:
 
         return code
 
-    def _blocks_to_code(self, blk, block_indices):
+    def _blocks_to_code(self, blk, block_indices=None):
         """ Convert a stack of blocks to pseudocode. """
         if blk is None:
             return ["%nothing%", "%nothing%"]
+        if block_indices is None:
+            block_indices = {
+                block: index for index, block in enumerate(self.tw.block_list.list)
+            }
         code = []
         dock = blk.docks[0]
         # There could be a '(', ')', '[' or ']'.
