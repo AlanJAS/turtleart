@@ -27,6 +27,7 @@ import pickle
 import subprocess
 import os
 import mimetypes
+import base64
 from gettext import gettext as _
 from gi.repository import Gtk
 from gi.repository import GLib
@@ -466,26 +467,17 @@ def get_path(activity, subpath):
 
 
 def image_to_base64(image_path, tmp_path):
-    ''' Convert an image to base64-encoded data '''
-    base64 = os.path.join(tmp_path, 'base64tmp')
-    cmd = 'base64 <' + image_path + ' >' + base64
-    subprocess.check_call(cmd, shell=True)
-    file_handle = open(base64, 'r')
-    data = file_handle.read()
-    file_handle.close()
-    os.remove(base64)
-    return data
+    """Encode an image without invoking a shell or creating scratch files."""
+    with open(image_path, 'rb') as image_file:
+        return base64.encodebytes(image_file.read()).decode('ascii')
 
 
 def base64_to_image(data, path_name):
-    ''' Convert base64-encoded data to an image '''
-    base64 = os.path.join(path_name, 'base64tmp')
-    file_handle = open(base64, 'w')
-    file_handle.write(data)
-    file_handle.close()
+    """Decode an image without interpreting paths as shell commands."""
+    decoded = base64.b64decode(data)
     file_name = os.path.join(path_name, 'imagetmp.png')
-    cmd = 'base64 -d <' + base64 + '>' + file_name
-    subprocess.check_call(cmd, shell=True)
+    with open(file_name, 'wb') as image_file:
+        image_file.write(decoded)
     return file_name
 
 
