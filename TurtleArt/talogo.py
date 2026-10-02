@@ -27,7 +27,7 @@ import tempfile
 import urllib.error
 import urllib.parse
 import urllib.request
-from collections import UserDict
+from collections import UserDict, deque
 from os.path import exists as os_path_exists
 from time import time, sleep
 
@@ -413,9 +413,11 @@ class LogoCode:
         in a tuple, e.g., (#forward, 16)
         """
         # debug_output(line, self.tw.running_sugar)
+        if not isinstance(line, deque):
+            line = deque(line)
         res = []
         while line:
-            token = line.pop(0)
+            token = line.popleft()
             bindex = None
             if isinstance(token, tuple):
                 (token, bindex) = token
