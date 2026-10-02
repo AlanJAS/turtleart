@@ -139,16 +139,15 @@ class Blocks:
     def get_next_block_of_same_type(self, block):
         if block is None:
             return None
-        type = block.type
-        i = 0
-        while block is not None:
-            block = self.get_next_block(block)
-            if block is not None:
-                if block.type == type:
-                    return block
-            if i == len(self.list):
-                break
-            i += 1
+        try:
+            start = self.list.index(block)
+        except ValueError:
+            return None
+        block_type = block.type
+        for offset in range(1, len(self.list) + 1):
+            candidate = self.list[(start + offset) % len(self.list)]
+            if candidate.type == block_type:
+                return candidate
         return None
 
     def get_similar_blocks(self, block_type, name):
