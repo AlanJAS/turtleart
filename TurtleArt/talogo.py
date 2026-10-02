@@ -108,7 +108,7 @@ class logoerror(Exception):
         return str(self.value)
 
 
-class NegativeRootError(BaseException):
+class NegativeRootError(Exception):
     """Similar to the ZeroDivisionError, this error is raised at runtime
     when trying to computer the square root of a negative number."""
 
