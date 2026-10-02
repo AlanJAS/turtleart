@@ -915,12 +915,11 @@ def check_output(command, warning):
     ''' Workaround for old systems without subprocess.check_output'''
     if hasattr(subprocess, 'check_output'):
         try:
-            output = subprocess.check_output(command)
+            output = subprocess.check_output(command, universal_newlines=True)
         except subprocess.CalledProcessError:
             print(warning)
             return None
     else:
-        import subprocess
 
         cmd = ''
         for c in command:
