@@ -505,12 +505,18 @@ class LogoCode:
             for token in reversed(self.iline):
                 if isinstance(token, tuple):
                     name = token[0].name
-                    if name in ("left", "right", "forward", "back"):
+                    # Expressions must be evaluated by the interpreter, not
+                    # split or duplicated while preparing the animation.
+                    if (name in ("left", "right", "forward", "back")
+                            and expanded
+                            and isinstance(expanded[-1], numbers.Number)):
                         degree = expanded.pop()
                         for _ in range(factor):
                             expanded.extend((degree / factor, token))
                         continue
-                    if name == "arc":
+                    if (name == "arc" and len(expanded) >= 2
+                            and isinstance(expanded[-1], numbers.Number)
+                            and isinstance(expanded[-2], numbers.Number)):
                         degree = expanded.pop()
                         radius = expanded.pop()
                         for _ in range(factor):
