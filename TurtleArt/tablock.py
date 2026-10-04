@@ -446,6 +446,14 @@ class Block:
         self._set_label_attributes()
         self.spr.set_shape(self.shapes[0])
 
+    def refresh_label_layout(self):
+        """Update label geometry without rebuilding unchanged block images."""
+        if self.spr is None:
+            return
+        self._set_margins()
+        self._set_label_attributes()
+        self.spr.inval()
+
     def add_arg(self, keep_expanding=True):
         """ We may want to add additional slots for arguments ("innies"). """
         if self.spr is None:
