@@ -366,7 +366,7 @@ class LogoCode:
         return code
 
     def _blocks_to_code(self, blk, block_indices=None):
-        """ Convert a stack of blocks to pseudocode. """
+        """Convert blocks to pseudocode without recursive list copying."""
         if blk is None:
             return ["%nothing%", "%nothing%"]
         if block_indices is None:
@@ -374,35 +374,43 @@ class LogoCode:
                 block: index for index, block in enumerate(self.tw.block_list.list)
             }
         code = []
-        dock = blk.docks[0]
-        # There could be a '(', ')', '[' or ']'.
-        if len(dock) > 4 and dock[4] in ("[", "]", "]["):
-            code.append(dock[4])
-        if blk.primitive is not None:  # make a tuple (prim, blk)
-            if blk in block_indices:
-                code.append((blk.primitive, block_indices[blk]))
-            else:
-                code.append(blk.primitive)  # Hidden block
-        elif blk.is_value_block():  # Extract the value from content blocks.
-            value = blk.get_value()
-            if value is None:
-                return ["%nothing%"]
-            else:
-                code.append(value)
-        else:
-            return ["%nothing%"]
-        if blk.connections is not None and len(blk.connections) > 0:
-            for i in range(1, len(blk.connections)):
-                b = blk.connections[i]
-                dock = blk.docks[i]
-                # There could be a '(', ')', '[' or ']'.
-                if len(dock) > 4 and dock[4] in ("[", "]", "]["):
-                    for c in dock[4]:
-                        code.append(c)
-                if b is not None:
-                    code.extend(self._blocks_to_code(b, block_indices))
-                elif blk.docks[i][0] not in ["flow", "unavailable"]:
+        # Each frame holds a block and the next dock to visit. Dock zero
+        # emits the block itself; subsequent docks visit its children.
+        pending = [(blk, 0)]
+        while pending:
+            block, dock_index = pending.pop()
+            if dock_index == 0:
+                if block.primitive is not None:
+                    if block in block_indices:
+                        token = (block.primitive, block_indices[block])
+                    else:
+                        token = block.primitive  # Hidden block
+                elif block.is_value_block():
+                    token = block.get_value()
+                    if token is None:
+                        code.append("%nothing%")
+                        continue
+                else:
                     code.append("%nothing%")
+                    continue
+                dock = block.docks[0]
+                if len(dock) > 4 and dock[4] in ("[", "]", "]["):
+                    code.append(dock[4])
+                code.append(token)
+                if block.connections is not None and len(block.connections) > 1:
+                    pending.append((block, 1))
+                continue
+
+            dock = block.docks[dock_index]
+            if len(dock) > 4 and dock[4] in ("[", "]", "]["):
+                code.extend(dock[4])
+            if dock_index + 1 < len(block.connections):
+                pending.append((block, dock_index + 1))
+            child = block.connections[dock_index]
+            if child is not None:
+                pending.append((child, 0))
+            elif dock[0] not in ("flow", "unavailable"):
+                code.append("%nothing%")
         return code
 
     def _setup_cmd(self, string):
