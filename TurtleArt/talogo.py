@@ -856,7 +856,7 @@ class LogoCode:
         self.hollow_thickness = num
 
         if blklist:
-            self.icall(self.evline, blklist[:])
+            self.icall(self.evline, blklist)
             yield True
 
         # Set it back to normal
@@ -878,7 +878,7 @@ class LogoCode:
                     "or a callable that returns an iterator"
                 )
         while next(controller):
-            self.icall(self.evline, blklist[:])
+            self.icall(self.evline, blklist)
             yield True
             if self.procstop:
                 break
@@ -887,7 +887,7 @@ class LogoCode:
 
     def prim_clamp(self, blklist):
         """ Run clamp blklist """
-        self.icall(self.evline, blklist[:])
+        self.icall(self.evline, blklist)
         yield True
         self.procstop = False
         self.ireturn()
@@ -933,7 +933,7 @@ class LogoCode:
     def prim_if(self, boolean, blklist):
         """ If bool, do list """
         if boolean:
-            self.icall(self.evline, blklist[:])
+            self.icall(self.evline, blklist)
             yield True
         self.ireturn()
         yield True
@@ -941,10 +941,10 @@ class LogoCode:
     def prim_ifelse(self, boolean, list1, list2):
         """ If bool, do list1, else do list2 """
         if boolean:
-            self.ijmp(self.evline, list1[:])
+            self.ijmp(self.evline, list1)
             yield True
         else:
-            self.ijmp(self.evline, list2[:])
+            self.ijmp(self.evline, list2)
             yield True
 
     def prim_set_box(self, name, value):
