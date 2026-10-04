@@ -91,7 +91,7 @@ from TurtleArt.util.menubuilder import (
     make_checkmenu_item,
 )
 
-from TurtleArt.util.helpbutton import TutorialWindows
+from TurtleArt.util.tutorial import TutorialWindows
 
 class TurtleMain:
 
