@@ -451,7 +451,7 @@ return %s(self)"
         win = Gtk.Window(Gtk.WindowType.TOPLEVEL)
         win.set_default_size(self.width, self.height)
         win.move(self.x, self.y)
-        win.maximize()
+        #win.maximize()
         win.set_title("%s %s" % (self.name, str(self.version)))
         if os.path.exists(os.path.join(self._share_path, self._ICON_SUBPATH)):
             win.set_icon_from_file(os.path.join(self._share_path, self._ICON_SUBPATH))
@@ -666,7 +666,7 @@ Would you like to save before quitting?"
             cancel_plugin_install(tmp_dir)
 
     def _do_tutorial_cb(self, widget):
-        win = TutorialWindows()
+        win = TutorialWindows(self._share_path)
         win.execute()
 
     def _do_new_cb(self, widget):

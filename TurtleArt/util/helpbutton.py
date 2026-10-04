@@ -54,7 +54,7 @@ class HelpButton(Gtk.ToolItem):
         self._current_palette = name
 
     def __help_button_clicked_cb(self, button):
-        win = TutorialWindows()
+        win = TutorialWindows(self._activity.bundle_path)
         win.execute()
 
 

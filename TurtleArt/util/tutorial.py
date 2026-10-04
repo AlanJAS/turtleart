@@ -19,11 +19,14 @@
 
 """GTK tutorial shared by the desktop application and Sugar activity."""
 
+import os
+
 from gi.repository import Gtk, GdkPixbuf
 
 
 class TutorialWindows:
-    def __init__(self):
+    def __init__(self, resource_path):
+        tutorial_path = os.path.join(os.path.abspath(resource_path), 'tutorial')
         self.array = []
 
         # Current Index of the Window we are at
@@ -38,7 +41,7 @@ class TutorialWindows:
             "\n"
             "\nEvery block inside start is executed after we click the start block.")
 
-        w1.gif_path = "GIF1.gif"
+        w1.gif_path = os.path.join(tutorial_path, 'GIF1.gif')
         w1.anim = GdkPixbuf.PixbufAnimation.new_from_file(w1.gif_path)
         w1.gif_image = Gtk.Image.new_from_animation(w1.anim)
         w1.box_gif.pack_start(w1.gif_image, False, False, 0)
@@ -60,7 +63,7 @@ class TutorialWindows:
             "\n"
             "\nFinally we move the turtle by the value stored in the box my box_1")
 
-        w2.gif_path = "GIF2.gif"
+        w2.gif_path = os.path.join(tutorial_path, 'GIF2.gif')
         w2.anim = GdkPixbuf.PixbufAnimation.new_from_file(w2.gif_path)
         w2.gif_image = Gtk.Image.new_from_animation(w2.anim)
         w2.box_gif.pack_start(w2.gif_image, True, True, 0)
@@ -78,7 +81,7 @@ class TutorialWindows:
             "\n"
             "\nBy doing so we effectively increase the value stored in my box_1.")
 
-        w3.gif_path = "GIF3.gif"
+        w3.gif_path = os.path.join(tutorial_path, 'GIF3.gif')
         w3.anim = GdkPixbuf.PixbufAnimation.new_from_file(w3.gif_path)
         w3.gif_image = Gtk.Image.new_from_animation(w3.anim)
         w3.box_gif.pack_start(w3.gif_image, True, True, 0)
@@ -99,7 +102,7 @@ class TutorialWindows:
             "\n"
             "\nIt's all done, Good Luck and have fun!!!")
 
-        wn.gif_path = "GIF4.gif"
+        wn.gif_path = os.path.join(tutorial_path, 'GIF4.gif')
         wn.anim = GdkPixbuf.PixbufAnimation.new_from_file(wn.gif_path)
         wn.gif_image = Gtk.Image.new_from_animation(wn.anim)
         wn.box_gif.pack_start(wn.gif_image, True, True, 0)
