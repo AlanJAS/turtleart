@@ -4384,21 +4384,23 @@ class TurtleArtWindow():
             else:
                 data.append((blk.id, name, sx, sy, connections))
         if save_turtle:
-            for turtle in iter(self.turtles.dict):
+            for name, turtle in self.turtles.dict.items():
                 # Don't save remote turtles
-                if not self.remote_turtle(turtle):
+                if not self.remote_turtle(name):
                     # Save default turtle as 'Yertle'
-                    if turtle == self.nick:
-                        turtle = DEFAULT_TURTLE
-                    pos = self.turtles.get_active_turtle().get_xy()
+                    if name == self.nick:
+                        saved_name = DEFAULT_TURTLE
+                    else:
+                        saved_name = name
+                    pos = turtle.get_xy()
                     data.append(
                         (-1,
-                         ['turtle', turtle],
+                         ['turtle', saved_name],
                          pos[0], pos[1],
-                         self.turtles.get_active_turtle().get_heading(),
-                         self.turtles.get_active_turtle().get_color(),
-                         self.turtles.get_active_turtle().get_shade(),
-                         self.turtles.get_active_turtle().get_pen_size()))
+                         turtle.get_heading(),
+                         turtle.get_color(),
+                         turtle.get_shade(),
+                         turtle.get_pen_size()))
             # Also save font scale
             data.append((-1, '_saved_font_scale', 0, 0, self.block_scale))
 
