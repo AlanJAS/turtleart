@@ -672,21 +672,23 @@ class TurtleArtWindow():
                                          filename + '.svg')))
                     break
 
+    def _get_status_shape(self, name):
+        """Load a message image once, when it is first needed."""
+        if name not in STATUS_SHAPES:
+            raise KeyError(name)
+        if name not in self.status_shapes:
+            filename = name
+            if name in ('print', 'help', 'status') and self.width > 1024:
+                filename += '1200'
+            self.status_shapes[name] = svg_str_to_pixbuf(
+                svg_from_file(os.path.join(self.images_path, filename + '.svg')))
+        return self.status_shapes[name]
+
     def _setup_misc(self):
         ''' Misc. sprites for status, overlays, etc. '''
         self.load_media_shapes()
-        for i, name in enumerate(STATUS_SHAPES):
-            # Temporary hack to use wider shapes
-            if name in ['print', 'help', 'status'] and self.width > 1024:
-                self.status_shapes[name] = svg_str_to_pixbuf(
-                    svg_from_file(
-                        os.path.join(self.images_path, name + '1200.svg')))
-            else:
-                self.status_shapes[name] = svg_str_to_pixbuf(
-                    svg_from_file(
-                        os.path.join(self.images_path, name + '.svg')))
         self.status_spr = Sprite(self.sprite_list, 0, self.height - 200,
-                                 self.status_shapes['status'])
+                                 self._get_status_shape('status'))
         self.status_spr.hide()
         self.status_spr.type = 'status'
         self._autohide_shape = True
@@ -4538,7 +4540,7 @@ class TurtleArtWindow():
         else:
             self._autohide_shape = False
         if shp == 'syntaxerror' and str(label) != '':
-            if str(label)[1:] in self.status_shapes:
+            if str(label)[1:] in STATUS_SHAPES:
                 shp = str(label)[1:]
                 label = ''
             else:
@@ -4549,7 +4551,7 @@ class TurtleArtWindow():
         if self.running_sugar and \
            shp not in ['print', 'status', 'info', 'help']:
             self.activity.error_list.append(shp)
-        self.status_spr.set_shape(self.status_shapes[shp])
+        self.status_spr.set_shape(self._get_status_shape(shp))
         self.status_spr.set_label_attributes(12.0, rescale=False)
         if shp == 'status':
             # Make sure True and False get added to the POT file
