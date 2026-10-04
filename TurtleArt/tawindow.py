@@ -3057,22 +3057,22 @@ class TurtleArtWindow():
         best_destination = None
         d = _SNAP_THRESHOLD
         self.inserting_block_mid_stack = False
+        # Build candidates once, preserving their order for equal distances.
+        dragged_blocks = set(self.drag_group)
+        candidates = [block for block in self.just_blocks()
+                      if block.status != 'collapsed'
+                      and block not in dragged_blocks]
         for selected_block_dockn in range(len(selected_block.docks)):
-            for destination_block in self.just_blocks():
-                # Don't link to a block that is hidden
-                if destination_block.status == 'collapsed':
-                    continue
-                # Don't link to a block to which you're already connected
-                if destination_block in self.drag_group:
-                    continue
+            for destination_block in candidates:
                 # Check each dock of destination for a possible connection
                 for destination_dockn in range(len(destination_block.docks)):
                     this_xy = self.dock_dx_dy(
                         destination_block, destination_dockn,
                         selected_block, selected_block_dockn)
-                    if magnitude(this_xy) > d:
+                    distance = magnitude(this_xy)
+                    if distance > d:
                         continue
-                    d = magnitude(this_xy)
+                    d = distance
                     best_xy = this_xy
                     best_destination = destination_block
                     best_destination_dockn = destination_dockn
