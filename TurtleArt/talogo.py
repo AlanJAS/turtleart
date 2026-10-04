@@ -497,53 +497,27 @@ class LogoCode:
         self.iline = list(blklist) if self.tw.step_time > 0 else deque(blklist)
         self.arglist = None
 
-        # Artificially modify the stack to support glide operations
+        # Build the expanded sequence backwards so arguments are available
+        # without inserting into the middle of a list.
         if self.tw.step_time > 0:
             factor = 4
-            n = len(self.iline)
-
-            # Iterate from right to left to not mess up the stack
-            for i in range(n - 1, -1, -1):
-                if isinstance(self.iline[i], tuple):
-                    if (self.iline[i][0].name == "left" or self.iline[i][0].name == "right"
-                            or self.iline[i][0].name == "forward" or self.iline[i][0].name == "back"):
-
-                        # Remove the number associated with the rotation
-                        degree = self.iline.pop(i + 1)
-
-                        # Remove the action
-                        action = self.iline.pop(i)
-
-                        for h in range(factor):
-
-                            # Insert the action
-                            self.iline.insert(i, action)
-
-                            # Insert the degree divided by factor
-                            self.iline.insert(i + 1, degree / factor)
-                    elif self.iline[i][0].name == "arc":
-
-                        # Remove the number associated with the radius
-                        radius = self.iline.pop(i + 2)
-
-                        # Remove the number associated with the rotation
-                        degree = self.iline.pop(i + 1)
-
-                        # Remove the action
-                        action = self.iline.pop(i)
-
-                        for h in range(factor):
-                            # Insert the action
-                            self.iline.insert(i, action)
-
-                            # Insert the degree divided by factor
-                            self.iline.insert(i + 1, degree / factor)
-
-                            # Insert the radius
-                            self.iline.insert(i + 2, radius)
-
-        if self.tw.step_time > 0:
-            self.iline = deque(self.iline)
+            expanded = []
+            for token in reversed(self.iline):
+                if isinstance(token, tuple):
+                    name = token[0].name
+                    if name in ("left", "right", "forward", "back"):
+                        degree = expanded.pop()
+                        for _ in range(factor):
+                            expanded.extend((degree / factor, token))
+                        continue
+                    if name == "arc":
+                        degree = expanded.pop()
+                        radius = expanded.pop()
+                        for _ in range(factor):
+                            expanded.extend((radius, degree / factor, token))
+                        continue
+                expanded.append(token)
+            self.iline = deque(reversed(expanded))
 
         while self.iline:
             token = self.iline[0]
