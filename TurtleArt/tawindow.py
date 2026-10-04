@@ -123,7 +123,8 @@ from .tautils import (magnitude, get_load_name, get_save_name, data_from_file,
                       error_output, find_hat, find_bot_block,
                       restore_clamp, collapse_clamp, data_from_string,
                       increment_name, get_screen_dpi, is_writeable)
-from .tasprite_factory import (svg_str_to_pixbuf, svg_from_file)
+from .tasprite_factory import (svg_str_to_pixbuf, svg_from_file,
+                               finish_svg_loading)
 from .tapalette import block_primitives
 from .tapaletteview import PaletteView
 from .taselector import (Selector, create_toolbar_background)
@@ -370,8 +371,11 @@ class TurtleArtWindow():
         if self.interactive_mode:
             GLib.idle_add(self._lazy_init)
         else:
-            self._init_plugins()
-            self._setup_plugins()
+            try:
+                self._init_plugins()
+                self._setup_plugins()
+            finally:
+                finish_svg_loading()
 
     # To return lc for it to be used in taturtle
     def LC(self):
@@ -387,27 +391,30 @@ class TurtleArtWindow():
             return True
 
     def _lazy_init(self):
-        self._init_plugins()
-        self._setup_plugins()
-        self._setup_misc()
+        try:
+            self._init_plugins()
+            self._setup_plugins()
+            self._setup_misc()
 
-        if self.running_turtleart:
-            self._basic_palettes.make_trash_palette()
-            for name in palette_init_on_start:
-                debug_output('initing palette %s' % (name), self.running_sugar)
-                self.show_toolbar_palette(palette_names.index(name),
+            if self.running_turtleart:
+                self._basic_palettes.make_trash_palette()
+                for name in palette_init_on_start:
+                    debug_output('initing palette %s' % (name), self.running_sugar)
+                    self.show_toolbar_palette(palette_names.index(name),
+                                              init_only=False,
+                                              regenerate=True,
+                                              show=False)
+
+                self.show_toolbar_palette(0,
                                           init_only=False,
                                           regenerate=True,
-                                          show=False)
+                                          show=True)
 
-            self.show_toolbar_palette(0,
-                                      init_only=False,
-                                      regenerate=True,
-                                      show=True)
-
-            if self.running_sugar:
-                self.activity.check_buttons_for_fit()
-                self.activity.update_palette_from_metadata()
+                if self.running_sugar:
+                    self.activity.check_buttons_for_fit()
+                    self.activity.update_palette_from_metadata()
+        finally:
+            finish_svg_loading()
 
     def _set_screen_dpi(self):
         dpi = get_screen_dpi()
