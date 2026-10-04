@@ -1148,6 +1148,8 @@ class LogoCode:
             if name not in self.value_blocks_to_update:
                 return
             for block in self.value_blocks_to_update[name]:
+                if block.spr.get_label() == block_names[name][0]:
+                    continue
                 block.spr.set_label(block_names[name][0])
                 if name == "box":
                     argblk = block.connections[-2]
@@ -1168,15 +1170,18 @@ class LogoCode:
                 valstring = str(value)
             if name not in self.value_blocks_to_update:
                 return
+            new_label = block_names[name][0] + " = " + valstring
             for block in self.value_blocks_to_update[name]:
+                if block.spr.get_label() == new_label:
+                    continue
                 if label is None:
-                    block.spr.set_label(block_names[name][0] + " = " + valstring)
+                    block.spr.set_label(new_label)
                     block.resize()
                 else:
                     argblk = block.connections[-2]
                     # Only update if label matches
                     if argblk is not None and argblk.spr.labels[0] == label:
-                        block.spr.set_label(block_names[name][0] + " = " + valstring)
+                        block.spr.set_label(new_label)
                         dx = block.dx
                         block.resize()
                         # Move connections over...

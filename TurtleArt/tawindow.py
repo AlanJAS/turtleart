@@ -4460,10 +4460,12 @@ class TurtleArtWindow():
 
     def _set_coordinates_label(self, text):
         if self.running_sugar:
-            self.activity.coordinates_label.set_text(text)
+            if self.activity.coordinates_label.get_text() != text:
+                self.activity.coordinates_label.set_text(text)
             self.activity.coordinates_label.show()
         elif self.interactive_mode:
-            self.parent.set_title(text)
+            if self.parent.get_title() != text:
+                self.parent.set_title(text)
 
     def print_(self, n, flag):
         """ Print object n to the bar at the bottom of the screen """
