@@ -1345,9 +1345,9 @@ class Block:
         self.svg.set_gradient(True, GRADIENT_COLOR)
         self.svg.clear_docks()
         if arg is None:
-            pixbuf = svg_str_to_pixbuf(function())
+            pixbuf = svg_str_to_pixbuf(function(), cache=True)
         else:
-            pixbuf = svg_str_to_pixbuf(function(arg))
+            pixbuf = svg_str_to_pixbuf(function(arg), cache=True)
         self.width = self.svg.get_width()
         self.height = self.svg.get_height()
         self.shapes[0] = _pixbuf_to_cairo_surface(pixbuf,
@@ -1355,9 +1355,9 @@ class Block:
         self.svg.set_gradient(False)
         self.svg.clear_docks()
         if arg is None:
-            pixbuf = svg_str_to_pixbuf(function())
+            pixbuf = svg_str_to_pixbuf(function(), cache=True)
         else:
-            pixbuf = svg_str_to_pixbuf(function(arg))
+            pixbuf = svg_str_to_pixbuf(function(arg), cache=True)
         self.shapes[1] = _pixbuf_to_cairo_surface(pixbuf,
                                                   self.width, self.height)
 

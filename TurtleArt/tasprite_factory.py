@@ -1628,10 +1628,10 @@ def finish_svg_loading():
     _svg_pixbuf_cache = None
 
 
-def svg_str_to_pixbuf(svg_string):
+def svg_str_to_pixbuf(svg_string, cache=False):
     """Rasterize SVG, reusing images during startup without sharing mutations."""
     svg_bytes = svg_string.encode()
-    if _svg_pixbuf_cache is not None:
+    if cache and _svg_pixbuf_cache is not None:
         cached = _svg_pixbuf_cache.get(svg_bytes)
         if cached is not None:
             return cached.copy()
@@ -1640,7 +1640,7 @@ def svg_str_to_pixbuf(svg_string):
     pl.write(svg_bytes)
     pl.close()
     pixbuf = pl.get_pixbuf()
-    if _svg_pixbuf_cache is not None:
+    if cache and _svg_pixbuf_cache is not None:
         # Keep a private copy so callers can modify their result safely.
         _svg_pixbuf_cache[svg_bytes] = pixbuf.copy()
     return pixbuf
