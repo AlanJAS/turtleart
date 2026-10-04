@@ -3088,6 +3088,17 @@ class TurtleArtWindow():
                                  best_destination_dockn):
                 return
 
+            # Derive insertion mode only from the chosen, validated dock.
+            self.inserting_block_mid_stack = (
+                selected_block.docks[best_selected_block_dockn][0] == 'flow'
+                and best_selected_block_dockn == 0
+                and best_destination.connections is not None
+                and best_destination.connections[best_destination_dockn]
+                is not None
+                and (best_destination_dockn ==
+                     len(best_destination.connections) - 1
+                     or best_destination.name in EXPANDABLE_FLOW))
+
             # Move the selected blocks into the docked position
             for blk in self.drag_group:
                 (sx, sy) = blk.spr.get_xy()
@@ -5030,18 +5041,10 @@ variable'))
         # Cannot connect an innie to an innie or an outie to an outie
         if d1dir == d2dir:
             return _NO_DOCK
-        # Flow blocks can be inserted into the middle of a stack
-        if d2type == 'flow' and dock2n == 0:
-            if block1.connections is not None and \
-               dock1n == len(block1.connections) - 1 and \
-               block1.connections[dock1n] is not None:
-                self.inserting_block_mid_stack = True
-            elif block1.connections is not None and \
-                    block1.name in EXPANDABLE_FLOW and \
-                    block1.connections[dock1n] is not None:
-                self.inserting_block_mid_stack = True
-        # Only number blocks can be docked when the dock is not empty
-        elif d2type != 'number' or dock2n != 0:
+        # Flow inputs may insert into an occupied stack. Other occupied
+        # docks only accept number blocks, as before.
+        if not (d2type == 'flow' and dock2n == 0) and \
+                (d2type != 'number' or dock2n != 0):
             if block1.connections is not None and \
                     dock1n < len(block1.connections) and \
                     block1.connections[dock1n] is not None:
