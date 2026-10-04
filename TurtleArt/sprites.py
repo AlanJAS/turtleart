@@ -151,13 +151,17 @@ class Sprites:
         if cr is None:
             print('sprites.redraw_sprites: no Cairo context')
             return
+        if area is None:
+            x1, y1, x2, y2 = cr.clip_extents()
+        else:
+            x1, y1 = area.x, area.y
+            x2, y2 = x1 + area.width, y1 + area.height
         for spr in self.list:
-            if area is None:
+            rect = spr.rect
+            if (rect.x < x2 and rect.x + rect.width > x1
+                    and rect.y < y2 and rect.y + rect.height > y1):
                 spr.draw(cr=cr)
-            else:
-                intersection = spr.rect.intersect(area)
-                if intersection.width > 0 or intersection.height > 0:
-                    spr.draw(cr=cr)
+
 
 
 class Sprite:
