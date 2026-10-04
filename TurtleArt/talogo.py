@@ -493,7 +493,8 @@ class LogoCode:
     def evline(self, blklist, call_me=True):
         """ Evaluate a line of code from the list. """
         oldiline = self.iline
-        self.iline = blklist[:]
+        # Animation edits need a list; execution consumes a queue.
+        self.iline = list(blklist) if self.tw.step_time > 0 else deque(blklist)
         self.arglist = None
 
         # Artificially modify the stack to support glide operations
@@ -541,6 +542,8 @@ class LogoCode:
                             # Insert the radius
                             self.iline.insert(i + 2, radius)
 
+        if self.tw.step_time > 0:
+            self.iline = deque(self.iline)
 
         while self.iline:
             token = self.iline[0]
@@ -605,7 +608,7 @@ class LogoCode:
 
     def _eval(self, call_me=True):
         """ Evaluate the next token on the line of code we are processing. """
-        token = self.iline.pop(0)
+        token = self.iline.popleft()
         bindex = None
         if isinstance(token, tuple):
             (token, bindex) = token
@@ -802,7 +805,7 @@ class LogoCode:
     #
 
     def _prim_opar(self, val):
-        self.iline.pop(0)
+        self.iline.popleft()
         return val
 
     def _prim_define(self, name, body):
