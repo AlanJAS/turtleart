@@ -810,15 +810,21 @@ class TurtleArtWindow():
         # sw needs new bounds set
         # cr.scale(self.activity.global_x_scale, self.activity.global_y_scale)
 
-        cr.rectangle(self.rect.x, self.rect.y,
-                     self.rect.width, self.rect.height)
-
+        # GTK already clips cr to the invalidated region, so paint() and
+        # redraw_sprites() (which reads cr.clip_extents()) only touch it.
+        # Do not leave an unconsumed rectangle path on cr: the first
+        # sprite's cr.fill() would fill it too.
         if self.turtle_canvas is not None:
             cr.set_source_surface(self.turtle_canvas)
             cr.paint()
 
         # Refresh sprite list
         self.sprite_list.redraw_sprites(cr=cr)
+
+    def inval_rect(self, x, y, width, height):
+        ''' Force a refresh of just one rectangle of the window '''
+        if self.interactive_mode:
+            self.window.queue_draw_area(x, y, width, height)
 
     def eraser_button(self):
         ''' Eraser_button (hide status block when clearing the screen.) '''
