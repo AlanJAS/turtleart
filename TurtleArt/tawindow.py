@@ -751,7 +751,13 @@ class TurtleArtWindow():
 
     def is_project_empty(self):
         ''' Check to see if project has any blocks in use '''
-        return len(self.just_blocks()) == 1
+        count = 0
+        for blk in self.block_list.list:
+            if blk.type == 'block':
+                count = count + 1
+                if count > 1:
+                    return False
+        return count == 1
 
     def recalculate_constants(self):
         CONSTANTS['titlex'] = int(-(self.width * TITLEXY[0]
