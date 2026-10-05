@@ -3941,8 +3941,11 @@ class TurtleArtWindow():
         self.lc.stop_logo()
         self._loaded_project = ''
         # Put current project in the trash.
-        while len(self.just_blocks()) > 0:
-            blk = self.just_blocks()[0]
+        for blk in self.just_blocks():
+            # Trashing a stack changes the type of every block in it, so
+            # skip blocks that went to the trash with an earlier stack.
+            if blk.type != 'block':
+                continue
             top = find_top_block(blk)
             self._put_in_trash(top)
         self.canvas.clearscreen()
