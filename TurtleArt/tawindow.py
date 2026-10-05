@@ -4860,11 +4860,7 @@ class TurtleArtWindow():
 
     def just_blocks(self):
         ''' Filter out 'proto', 'trash', and 'deleted' blocks '''
-        just_blocks_list = []
-        for blk in self.block_list.list:
-            if blk.type == 'block':
-                just_blocks_list.append(blk)
-        return just_blocks_list
+        return [blk for blk in self.block_list.list if blk.type == 'block']
 
     def just_protos(self):
         ''' Filter out 'block', 'trash', and 'deleted' blocks '''
