@@ -3312,8 +3312,9 @@ class TurtleArtWindow():
         ''' Swap postion in block list of nested while blocks '''
         # Check to see if blk1 comes before blk2 in the block list.
         # If so, swap them.
-        i1 = self.just_blocks().index(blk1)
-        i2 = self.just_blocks().index(blk2)
+        blocks = self.just_blocks()
+        i1 = blocks.index(blk1)
+        i2 = blocks.index(blk2)
         if i1 < i2:
             self.block_list.swap(blk1, blk2)
 
