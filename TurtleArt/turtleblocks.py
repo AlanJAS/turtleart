@@ -31,7 +31,6 @@ import errno
 import configparser
 import tarfile
 import tempfile
-import subprocess
 
 import gi
 
@@ -687,20 +686,12 @@ Would you like to save before quitting?"
         if file_path is None:
             return
         try:
-            # Copy to tmp file since some systems had trouble
-            # with gunzip directly from datastore
-            datapath = get_path(None, "instance")
-            if not os.path.exists(datapath):
-                os.makedirs(datapath)
-            tmpfile = os.path.join(datapath, "tmpfile.tar.gz")
-            subprocess.call(["cp", file_path, tmpfile])
-            status = subprocess.call(["gunzip", tmpfile])
-            if status == 0:
-                tar_fd = tarfile.open(tmpfile[:-3], "r")
-            else:
-                tar_fd = tarfile.open(tmpfile, "r")
-        except BaseException:
-            tar_fd = tarfile.open(file_path, "r")
+            # "r:*" transparently handles both gzip-compressed and plain
+            # tar archives, so no external cp/gunzip/rm is needed.
+            tar_fd = tarfile.open(file_path, "r:*")
+        except (tarfile.TarError, OSError):
+            self.restore_cursor()
+            return
 
         tmp_dir = tempfile.mkdtemp()
 
@@ -712,8 +703,6 @@ Would you like to save before quitting?"
             self.restore_cursor()
         finally:
             tar_fd.close()
-            # Remove tmpfile.tar
-            subprocess.call(["rm", os.path.join(datapath, "tmpfile.tar")])
 
     def _do_save_cb(self, widget):
         """ Callback for save project. """
